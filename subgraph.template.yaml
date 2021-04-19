@@ -1,16 +1,16 @@
 specVersion: 0.0.2
 description: Your Description
-repository: Your Repo 
+repository: Your Repo
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: BadgeDefinitions
-    network: {{network}}
+    network: "{{network}}"
     source:
-      address: {{badgeRegistry}}
+      address: "{{badgeRegistry}}"
       abi: BadgeRegistry
-      startBlock: {{blockNumber}} 
+      startBlock: {{blockNumber}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -20,15 +20,15 @@ dataSources:
         - BadgeRegistry
       abis:
         - name: BadgeRegistry
-          file: ./node_modules/@badgeth_dao/contracts/dist/abis/BadgeRegistry.json
+          file: ./abis/BadgeRegistry.json
       eventHandlers:
         - event: BadgeDefinitionCreated(string,string,string,bool,bool)
           handler: handleBadgeDefinitionCreated
   - kind: ethereum/contract
     name: Staking
-    network: {{network}}
+    network: "{{network}}"
     source:
-      address: {{staking}}
+      address: "{{staking}}"
       abi: Staking
       startBlock: {{blockNumber}}
     mapping:

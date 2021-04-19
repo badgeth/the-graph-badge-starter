@@ -890,9 +890,10 @@
     "@ethersproject/properties" "^5.0.7"
     "@ethersproject/strings" "^5.0.8"
 
-"@graphprotocol/contracts@graphprotocol/contracts":
-  version "1.1.0"
-  resolved "https://codeload.github.com/graphprotocol/contracts/tar.gz/00bbc001f6df87471d0bcf3ff2c76ef21c7a1a9c"
+"@graphprotocol/contracts@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/contracts/-/contracts-1.2.0.tgz#72e080aa6a9eae874c8c63b45f74a0e36aa328ae"
+  integrity sha512-h8BDkv/41f5oEYEs0z66lTZW+VfEENKGnFP7xVCavV3NOZxoTI5sPvlO+FPCtakeIWxUcWM8+ayx8hzIKrR+aQ==
   dependencies:
     "@ethersproject/contracts" "^5.0.3"
     ethers "^5.0.9"
