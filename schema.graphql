@@ -1,0 +1,304 @@
+"""
+BadgeStats - tracks all badges and counts - singleton Entity
+"""
+type BadgeOverview @entity {
+  "Singleton, id always equal to 'BadgeOverview'"
+  id: ID!
+
+  "Manually manage list of badge definition ids for iteration"
+  badgeDefinitionCount: Int!
+}
+
+"""
+BadgeDefinition - read from the Badgeth BadgeDefinition smart contract
+"""
+type BadgeDefinition @entity {
+  "Incremented id"
+  id: ID!
+
+  "Optional name field"
+  name: String
+
+  "Unix Timestamp"
+  createdAtTimestamp: BigInt!
+
+  "Entity name - e.g. Indexer"
+  entity: String!
+
+  "Entity property - e.g. isOverDelegated"
+  property: String!
+
+  "Value before becoming an award"
+  preAwardValue: String!
+
+  "Value to trigger issuing award"
+  postAwardValue: String!
+
+  "Increments with each award"
+  badgeCount: Int!
+}
+
+"""
+Badge Awards given to Ethereum addresses
+"""
+type BadgeAward @entity {
+  "Ethereum address"
+  id: ID!
+
+  "Badge Name"
+  name: String!
+
+  "Unix Timestamp when this indexer was awarded this badge"
+  awardedAtTimestamp: BigInt!
+
+  "Ethereum block when this indexer was awarded this badge"
+  awardedAtBlock: BigInt!
+
+  "Increments each time badge is awarded"
+  badgeNumber: Int!
+
+  "True if badge award has been put on chain"
+  awardedOnChain: Boolean!
+
+  "True if badge award has been minted as NFT"
+  mintedOnChain: Boolean!
+}
+
+"""
+Awarded to indexers who become over-delegated
+"""
+type ItsOnlyWaferThinBadge @entity {
+  "Indexer address"
+  id: ID!
+
+  "Unix Timestamp when this indexer was awarded this badge"
+  awardedAtTimestamp: BigInt!
+
+  "Ethereum block when this indexer was awarded this badge"
+  awardedAtBlock: BigInt!
+
+  "Increments each time badge is awarded"
+  badgeNumber: BigInt!
+}
+
+"""
+Awarded to newly created indexers
+"""
+type AnIndexerIsBornBadge @entity {
+  "Indexer address"
+  id: ID!
+
+  "Unix Timestamp when this indexer was awarded this badge"
+  awardedAtTimestamp: BigInt!
+
+  "Ethereum block when this indexer was awarded this badge"
+  awardedAtBlock: BigInt!
+
+  "Increments each time badge is awarded"
+  badgeNumber: BigInt!
+}
+
+"""
+Indexer details
+"""
+type Indexer @entity {
+  "Ethereum address of the Indexer"
+  id: ID!
+
+  "Unix Timestamp when this indexer was created"
+  createdAtTimestamp: BigInt
+
+  "GRT Tokens staked in the protocol by the Indexer itself"
+  ownStake: BigDecimal
+
+  "GRT Tokens delegated to the Indexer"
+  delegatedStake: BigDecimal
+
+  "GRT Tokens allocated by the Indexer in the protocol"
+  allocatedStake: BigDecimal
+
+  "Ratio of allocated tokens versus allocation capacity: betwen 0 and 1"
+  allocationRatio: BigDecimal
+
+  "Maximum GRT Tokens that can be delegated to this Indexer before overdelegation"
+  maximumDelegation: BigDecimal
+
+  "GRT Tokens delegated to this indexer versus maximum delegation"
+  delegationRatio: BigDecimal
+
+  "Amount of shares in the Delegation Pool"
+  delegationPoolShares: BigInt
+
+  "Flags if an Indexer is over delegated"
+  isOverDelegated: Boolean
+
+  "Indexing Reward Cut Ratio: between 0 and 1"
+  indexingRewardCutRatio: BigDecimal
+
+  "Query Fee Cut Ratio: between 0 and 1"
+  queryFeeCutRatio: BigDecimal
+
+  "Block until the Delegator Parameters can not be modified"
+  delegatorParameterCooldownBlock: BigInt
+
+  "Reward per GRT token delegated over the last 30 days"
+  lastMonthDelegatorRewardRate: BigDecimal
+
+  "Number of updates on the parameters over the last 30 days"
+  lastMonthParametersUpdateCount: Int
+
+  "Indexer vesting contract (if any)"
+  vesting: IndexerVesting
+
+  "Historical updates of parameters made by the Indexer"
+  parameterUpdates: [IndexerParameterUpdate!] @derivedFrom(field: "indexer")
+
+  "Snapshots of changes for this indexer"
+  snapshots: [IndexerSnapshot!] @derivedFrom(field: "indexer")
+
+  "Total number of times"
+  slashCount: Int
+}
+
+"""
+Indexer Vesting contract
+"""
+type IndexerVesting @entity {
+  "Ethereum address of the Indexer"
+  id: ID!
+
+  "Indexer entity"
+  indexer: Indexer!
+
+  "Ethereum address of the Beneficiary"
+  beneficiary: Bytes!
+
+  "Amount of GRT managed by the vesting contract"
+  managedAmount: BigDecimal!
+}
+
+"""
+Indexer Monthly KPIs
+"""
+type IndexerMonthlyMetric @entity {
+  "Ethereum address of the Indexer + month + year"
+  id: ID!
+
+  "Indexer entity"
+  indexer: Indexer!
+
+  "Number of delegators who staked to this indexer"
+  newDelegatorCount: BigInt!
+}
+
+"""
+Indexer update of parameters
+"""
+type IndexerParameterUpdate @entity {
+  "Ethereum address of Indexer + block number"
+  id: ID!
+
+  "Indexer making the update"
+  indexer: Indexer!
+
+  "Unix Timestamp when this indexer made an update"
+  updatedAtTimestamp: BigInt!
+
+  "Ethereum block when this indexer made an update"
+  updatedAtBlock: BigInt!
+
+  "New Indexing Reward Cut Ratio: between 0 and 1"
+  newIndexingRewardCutRatio: BigDecimal!
+
+  "New Query Fee Cut Ratio: between 0 and 1"
+  newQueryFeeCutRatio: BigDecimal!
+
+  "Previous Indexing Reward Cut Ratio: between 0 and 1"
+  previousIndexingRewardCutRatio: BigDecimal
+
+  "Previous Query Fee Cut Ratio: between 0 and 1"
+  previousQueryFeeCutRatio: BigDecimal
+}
+
+"""
+Indexer Snapshot
+"""
+type IndexerSnapshot @entity {
+  "Ethereum address of Indexer + block number"
+  id: ID!
+
+  "Indexer for this snapshot"
+  indexer: Indexer!
+
+  "Unix Timestamp when this snapshot is created"
+  createdAtTimestamp: BigInt!
+
+  "Indexer own stake when the snapshot starts"
+  ownStakeInitial: BigDecimal!
+
+  "Delegated stake when the snapshot starts"
+  delegatedStakeInitial: BigDecimal!
+
+  "Change in Indexer own stake"
+  ownStakeDelta: BigDecimal!
+
+  "Change in Indexer delegated stake"
+  delegatedStakeDelta: BigDecimal!
+
+  "Indexing Rewards distributed to Delegation pool"
+  delegationPoolIndexingRewards: BigDecimal!
+
+  "Query Fees distributed to Delegation pool"
+  delegationPoolQueryFees: BigDecimal!
+
+  "Count the number of parameters change"
+  parametersChangeCount: Int!
+}
+
+"""
+Delegator with all their delegated stakes towards Indexers
+"""
+type Delegator @entity {
+  "Delegator address"
+  id: ID!
+  # "Stakes of this delegator"
+  # stakes: [DelegatedStake!]! @derivedFrom(field: "delegator")
+  # "CUMULATIVE staked tokens in DelegatorStakes of this Delegator"
+  # totalStakedTokens: BigInt!
+  # "CUMULATIVE unstaked tokens in DelegatorStakes of this Delegator"
+  # totalUnstakedTokens: BigInt!
+  "Time created at"
+  createdAtTimestamp: BigInt!
+  # "Total realized rewards on all delegated stakes. Realized rewards are added when undelegating and realizing a profit"
+  # totalRealizedRewards: BigDecimal!
+}
+
+"""
+Delegator stake for a single Indexer
+"""
+type DelegatedStake @entity {
+  "Concatenation of Delegator address and Indexer address"
+  id: ID!
+  "Index the stake is delegated to"
+  indexer: Indexer!
+  "Delegator"
+  delegator: Delegator!
+  "Time created at"
+  createdAtTimestamp: BigInt!
+  # "CUMULATIVE tokens delegated"
+  # stakedTokens: BigInt!
+  # "CUMULATIVE tokens undelegated"
+  # unstakedTokens: BigInt!
+  # "CURRENT tokens locked"
+  # lockedTokens: BigInt!
+  # "Epoch the locked tokens get unlocked"
+  # lockedUntil: Int!
+  # "Shares owned in the delegator pool. Used to calculate total amount delegated"
+  # shareAmount: BigInt!
+  # "The rate this delegator paid for their shares (calculated using average cost basis). Used for rewards calculations"
+  # personalExchangeRate: BigDecimal!
+  # "Realized rewards from undelegating and realizing a reward"
+  # realizedRewards: BigDecimal!
+  # "Time this delegator first delegated to an indexer"
+  # createdAt: Int!
+}
