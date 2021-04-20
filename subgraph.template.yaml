@@ -15,15 +15,21 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: ./src/mappings/badgeDefinition.ts
+      file: ./src/mappings/badgeRegistry.ts
       entities:
         - BadgeRegistry
       abis:
         - name: BadgeRegistry
           file: ./abis/BadgeRegistry.json
       eventHandlers:
-        - event: BadgeDefinitionCreated(string,string,string,bool,bool)
-          handler: handleBadgeDefinitionCreated
+        - event: BadgeAdded(string,int256)
+          handler: handleBadgeAdded
+        - event: BadgeRecipientAdded(address,string,int256)
+          handler: handleBadgeRecipientAdded
+        - event: BadgeMinted(string,int256)
+          handler: handleBadgeMinted
+        - event: BadgeRecipientDisputed(address,string,int256)
+          handler: handleBadgeRecipientDisputed
   - kind: ethereum/contract
     name: Staking
     network: "{{network}}"
